@@ -17,37 +17,61 @@
   }
 
 
-
-
-
-
  /*----------------------------------------- 
   Kaiopua's Signals listeners
  -------------------------------------------*/
-   function onAssetReady( ){console.log("onAssetReady "); console.log( arguments );}
+   function onAssetReady( ){
+     //console.log("onAssetReady "); console.log( arguments );
+     }
  function onError( ){console.log("onError "); console.log( arguments );}
- function onFocusGained( ){console.log("onFocusGained "); console.log( arguments );}
- function onFocusLost( ){console.log("onFocusLost "); console.log( arguments );}
+ function onFocusGained( ){
+   //console.log("onFocusGained "); console.log( arguments );
+   }
+ function onFocusLost( ){
+   //console.log("onFocusLost "); console.log( arguments );
+ }
  function onGamePaused( ){console.log("onGamePaused "); console.log( arguments );}
  function onGamePointerDoubleTapped(){console.log("onGamePointerDoubleTapped "); console.log( arguments );}
  function onGamePointerDragEnded(){console.log("onGamePointerDragEnded "); console.log( arguments );}
  function onGamePointerDragStarted(){console.log("onGamePointerDragStarted "); console.log( arguments );}
- function onGamePointerDragged(){console.log("onGamePointerDragged "); console.log( arguments );}
+ function onGamePointerDragged(){
+   //console.log("onGamePointerDragged "); console.log( arguments );
+}
  function onGamePointerHeld( ){console.log("onGamePointerHeld "); console.log( arguments );}
  
- function onGamePointerMoved( ){console.log("onGamePointerMoved "); console.log( arguments );}
+ function onGamePointerMoved( ){
+   //console.log("onGamePointerMoved "); 
+   //console.log( arguments );
+  }
  
- function onGamePointerTapped(){console.log("onGamePointerTapped "); console.log( arguments );} 
- function onGamePointerWheel( ){console.log("onGamePointerWheel "); console.log( arguments );}
+ function onGamePointerTapped(){
+   //console.log("onGamePointerTapped "); console.log( arguments );
+   } 
+ function onGamePointerWheel( ){
+   //console.log("onGamePointerWheel "); console.log( arguments );
+   }
  function onGameResumed( ){console.log("onGameResumed "); console.log( arguments );}
- function onGameStarted( ){console.log("onGameStarted "); console.log( arguments );}
+
+ //triggered only once, when pressing the start button 
+ function onGameStarted( ){
+   console.log("*************onGameStarted************"); console.log( arguments );
+  KAIOPUA.shared.player.planting.onPlantSelected.add(onPlantSelected);
+  KAIOPUA.shared.player.planting.onPlantStarted.add(onPlantStarted);
+  KAIOPUA.shared.player.planting.onPlantStopped.add(onPlantStopped);
+  KAIOPUA.shared.player.planting.onPlanted.add(onPlanted);
+  KAIOPUA.shared.player.planting.onPlantedMulti.add(onPlantedMulti);
+  KAIOPUA.shared.player.planting.onPlantedSingle.add(onPlantedSingle);
+  KAIOPUA.shared.player.planting.onPuzzleSelected.add(onPuzzleSelected);
+  KAIOPUA.shared.player.planting.onPuzzleStarted.add(onPuzzleStarted);
+  KAIOPUA.shared.player.planting.onPuzzleStopped.add(onPuzzleStopped);
+  }
+
  function onGameStopped( ){console.log("onGameStopped "); console.log( arguments );}
  function onGameUpdated( ){
    //called each frame!
    //console.log("onGameUpdated "); console.log( arguments );
  }
  function onKeyPressed( ){
-  //console.log("onKeyPressed "); console.log( arguments );
   var p = KAIOPUA.shared.player;
   if(p.state.moving){
     var pc = adage_data({
@@ -62,16 +86,106 @@
   }
  }
 
- function onKeyReleased( ){console.log("onKeyReleased "); console.log( arguments );}
- function onLoadAllCompleted( ){console.log("onLoadAllCompleted "); console.log( arguments );}
- function onLoadItemCompleted(){console.log("onLoadItemCompleted "); console.log( arguments );} 
- function onLoadListCompleted(){console.log("onLoadListCompleted "); console.log( arguments );}
+ function onKeyReleased( ){
+   //console.log("onKeyReleased "); console.log( arguments );
+   }
+
+ function onLoadAllCompleted( ){
+   //console.log("onLoadAllCompleted "); console.log( arguments );
+   }
+  
+ function onLoadItemCompleted(){
+   //console.log("onLoadItemCompleted "); console.log( arguments );
+   } 
+
+ function onLoadListCompleted(){
+  // console.log("onLoadListCompleted "); console.log( arguments );
+ }
  function onUpdated( ){
    //called each frame! 
    //console.log("onUpdated "); console.log( arguments );
  }
- function onWindowResized( ){console.log("onWindowResized "); console.log( arguments );}
+ function onWindowResized( ){
+   //console.log("onWindowResized "); console.log( arguments );
+ }
 
+
+  function onPlantSelected(){
+    console.log("***********onPlantSelected************");
+    console.log(arguments); 
+  };
+  function onPlantStarted(){
+    console.log("************onPlantStarted***********");
+    console.log(arguments); 
+  };
+  function onPlantStopped(){console.log("onPlantStopped");};
+  
+  function onPlanted(){
+    console.log("*******onPlanted**********");
+    //this is not null only transiently..
+    var map = ""; 
+    var separator = "";
+    KAIOPUA.shared.player.planting.module.grid.children.forEach(function(c){
+      map = map + separator + (c.occupied?"1":"0");
+      separator=",";
+    });
+    console.log(map); 
+  };
+
+  function onPlantedMulti(){
+    console.log("**********onPlantedMulti**********");
+    console.log(arguments); 
+  };
+
+  function onPlantedSingle(){
+    console.log("************onPlantedSingle********");
+    console.log(arguments); 
+  };
+
+ function onPuzzleSelected(){
+  console.log("onPuzzleSelected");
+  console.log(arguments); 
+ };
+  
+  function onPuzzleStarted(puzzle){
+    console.log("********* onPuzzleStarted "+ puzzle.name);
+ 
+  puzzle.onCompleted.add(onCompleted);
+  puzzle.onShapeAdded.add(onShapeAdded);
+  puzzle.onShapeRemoved.add(onShapeRemoved);
+  puzzle.onShapesNeeded.add(onShapesNeeded);
+  puzzle.onShapesReady.add(onShapesReady);
+  puzzle.onStateChanged.add(onStateChanged);
+  };
+  
+  function onPuzzleStopped(){
+    console.log("**********onPuzzleStopped**************");
+    console.log(arguments); 
+    console.log(KAIOPUA.shared.player.planting.puzzle);
+    console.log(KAIOPUA.shared.player.planting.puzzleLast);
+  };
+
+  function onCompleted(){console.log("onCompleted");};
+ 
+  function onShapeAdded(){
+    console.log("onShapeAdded");
+    console.log(arguments); 
+  };
+  function onShapeRemoved(){
+    console.log("onShapeRemoved");
+    console.log(arguments); 
+  };
+  function onShapesNeeded(){console.log("onShapesNeeded");};
+  function onShapesReady(){console.log("onShapesReady");};
+  
+  function onStateChanged(){
+    console.log("onStateChanged");
+    console.log(arguments); 
+  };
+
+ /*-------------------------------
+  * attaching listeners to signals
+  * --------------------------------*/
  KAIOPUA.shared.signals.onAssetReady.add( onAssetReady);
 // KAIOPUA.shared.signals.onError.add( onError);
  KAIOPUA.shared.signals.onFocusGained.add( onFocusGained);
@@ -96,7 +210,6 @@
  KAIOPUA.shared.signals.onLoadListCompleted.add( onLoadListCompleted);
  KAIOPUA.shared.signals.onUpdated.add( onUpdated);
  KAIOPUA.shared.signals.onWindowResized.add( onWindowResized);
-
 
   Metacog.init({
     "session": {
