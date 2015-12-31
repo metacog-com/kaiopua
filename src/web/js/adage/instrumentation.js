@@ -16,6 +16,97 @@
     return props;
   }
 
+  adage_context_start = function(props, name){
+    props.name = name;
+    props.parent_name = "none"; 
+    props.success = false;
+    return props; 
+  }
+
+  adage_game_event = function(props){
+    props.virtual_context = "undefined";
+    return props; 
+  }
+
+  /*we are going to use the existing adage types, but also let extend some custom events*/
+  var EventGameStarted = function(){
+    var p = adage_data({});
+    ADAGE.Data.call(this, p); 
+    this.type = function(){return "GameStarted";}; 
+  };
+  EventGameStarted.prototype = Object.create(ADAGE.Data.prototype);
+  EventGameStarted.prototype.constructor = EventGameStarted;
+
+  var EventPuzzleStarted = function(name){
+    var p = adage_data({});
+    p = adage_context_start(p, name); 
+    ADAGE.ContextStart.call(this, p); 
+    this.type = function(){return "PuzzleStarted";}; 
+  };
+  EventPuzzleStarted.prototype = Object.create(ADAGE.ContextStart.prototype);
+  EventPuzzleStarted.prototype.constructor = EventPuzzleStarted;
+
+  var EventPuzzleStopped = function(puzzle){
+    var p = adage_data({});
+    p = adage_context_start(p, puzzle.name); 
+    ADAGE.ContextEnd.call(this, p); 
+    this.numElementsMin = puzzle.numElementsMin;
+    this.numElementsUsed = puzzle.numElementsUsed;
+    this.numShapesRequired = puzzle.numShapesRequired;
+    this.completed = puzzle.completed;
+    this.score = puzzle.score;
+    this.scorePct = puzzle.scorePct;
+    this.type = function(){return "PuzzleStopped";}; 
+  };
+  EventPuzzleStopped.prototype = Object.create(ADAGE.ContextEnd.prototype);
+  EventPuzzleStopped.prototype.constructor = EventPuzzleStopped;
+
+  var EventPlantPlanted = function(map){
+    var p = adage_data({});
+    p = adage_game_event(p);
+    ADAGE.GameEvent.call(this, p); 
+    this.map = map; 
+    this.type = function(){return "PlantPlanted";}; 
+  };
+  EventPlantPlanted.prototype = Object.create(ADAGE.GameEvent.prototype);
+  EventPlantPlanted.prototype.constructor = EventPlantPlanted;
+
+  var EventPlantRemoved = function(map){
+    var p = adage_data({});
+    p = adage_game_event(p);
+    ADAGE.GameEvent.call(this, p); 
+    this.map = map; 
+    this.type = function(){return "PlantRemoved";}; 
+  }
+  EventPlantRemoved.prototype = Object.create(ADAGE.GameEvent.prototype);
+  EventPlantRemoved.prototype.constructor = EventPlantRemoved;
+
+
+  /*------------------------------------------------
+   * helper methods
+   * -----------------------------------------------*/
+
+  /**
+   * returns a string-codified version of the status of the current puzzle
+   */
+  function map(){
+    //this is not null only transiently..
+    var map = ""; 
+    var separator = "";
+    
+    if(KAIOPUA.shared.player.planting.module){
+      var grid = KAIOPUA.shared.player.planting.module.grid;
+    }else {
+      grid = KAIOPUA.shared.player.planting.puzzle.grid;
+    }
+
+    grid.children.forEach(function(c){
+      map = map + separator + (c.occupied?"1":"0");
+      separator=",";
+    });
+    return map; 
+  }
+
 
  /*----------------------------------------- 
   Kaiopua's Signals listeners
@@ -54,7 +145,7 @@
 
  //triggered only once, when pressing the start button 
  function onGameStarted( ){
-   console.log("*************onGameStarted************"); console.log( arguments );
+  console.log("*************onGameStarted************"); console.log( arguments );
   KAIOPUA.shared.player.planting.onPlantSelected.add(onPlantSelected);
   KAIOPUA.shared.player.planting.onPlantStarted.add(onPlantStarted);
   KAIOPUA.shared.player.planting.onPlantStopped.add(onPlantStopped);
@@ -64,6 +155,8 @@
   KAIOPUA.shared.player.planting.onPuzzleSelected.add(onPuzzleSelected);
   KAIOPUA.shared.player.planting.onPuzzleStarted.add(onPuzzleStarted);
   KAIOPUA.shared.player.planting.onPuzzleStopped.add(onPuzzleStopped);
+  var ev = new EventGameStarted();
+  ADAGE.log(ev); 
   }
 
  function onGameStopped( ){console.log("onGameStopped "); console.log( arguments );}
@@ -118,18 +211,17 @@
     console.log("************onPlantStarted***********");
     console.log(arguments); 
   };
-  function onPlantStopped(){console.log("onPlantStopped");};
+  function onPlantStopped(){
+    console.log("**********onPlantStopped***********");
+    //this object becomes undefined if dragging a plant outside of the puzzle
+    if(!KAIOPUA.shared.player.planting.module){
+      ADAGE.log(new EventPlantRemoved(map()));  
+    }
+  };
   
   function onPlanted(){
     console.log("*******onPlanted**********");
-    //this is not null only transiently..
-    var map = ""; 
-    var separator = "";
-    KAIOPUA.shared.player.planting.module.grid.children.forEach(function(c){
-      map = map + separator + (c.occupied?"1":"0");
-      separator=",";
-    });
-    console.log(map); 
+    ADAGE.log(new EventPlantPlanted(map())); 
   };
 
   function onPlantedMulti(){
@@ -149,20 +241,21 @@
   
   function onPuzzleStarted(puzzle){
     console.log("********* onPuzzleStarted "+ puzzle.name);
- 
-  puzzle.onCompleted.add(onCompleted);
-  puzzle.onShapeAdded.add(onShapeAdded);
-  puzzle.onShapeRemoved.add(onShapeRemoved);
-  puzzle.onShapesNeeded.add(onShapesNeeded);
-  puzzle.onShapesReady.add(onShapesReady);
-  puzzle.onStateChanged.add(onStateChanged);
+    puzzle.onCompleted.add(onCompleted);
+    puzzle.onShapeAdded.add(onShapeAdded);
+    puzzle.onShapeRemoved.add(onShapeRemoved);
+    puzzle.onShapesNeeded.add(onShapesNeeded);
+    puzzle.onShapesReady.add(onShapesReady);
+    puzzle.onStateChanged.add(onStateChanged);
+
+    ADAGE.log(new EventPuzzleStarted(puzzle.name)); 
   };
   
-  function onPuzzleStopped(){
+  function onPuzzleStopped(puzzle){
     console.log("**********onPuzzleStopped**************");
-    console.log(arguments); 
-    console.log(KAIOPUA.shared.player.planting.puzzle);
-    console.log(KAIOPUA.shared.player.planting.puzzleLast);
+    //console.log(KAIOPUA.shared.player.planting.puzzle);
+    //console.log(KAIOPUA.shared.player.planting.puzzleLast);
+    ADAGE.log(new EventPuzzleStopped(puzzle));
   };
 
   function onCompleted(){console.log("onCompleted");};
