@@ -121,10 +121,10 @@ var KAIOPUA = (function (main) {
 	
     // load scripts
     $LAB.script( libsPrimaryList ).wait().script( libsSecondaryList ).wait().script( libsTertiaryList ).wait( init )
-      .script("//testwidget.s3-website-us-east-1.amazonaws.com/metacog_adage/js/adage.js")
-      .script("//testmetalogger.s3-website-us-east-1.amazonaws.com/metalogger-3.0.3.js")
+      .script("//www.metacog.com/developer/examples/metacog_adage/js/adage.js")
+      .script("//cdn.metacog.com/metalogger-3.0.3.js")
       .wait()
-      .script("//testwidget.s3-website-us-east-1.amazonaws.com/metacog_adage/js/metacog_adage.js")
+      .script("//www.metacog.com/developer/examples/metacog_adage/js/metacog_adage.js")
       .wait()
       .script("js/adage/instrumentation.js");
     
