@@ -122,7 +122,7 @@ var KAIOPUA = (function (main) {
     // load scripts
     $LAB.script( libsPrimaryList ).wait().script( libsSecondaryList ).wait().script( libsTertiaryList ).wait( init )
       .script("//www.metacog.com/developer/examples/metacog_adage/js/adage.js")
-      .script("//cdn.metacog.com/metalogger-3.0.3.js")
+      .script("//cdn.metacog.com/metalogger-3.2.0.js")
       .wait()
       .script("//www.metacog.com/developer/examples/metacog_adage/js/metacog_adage.js")
       .wait()

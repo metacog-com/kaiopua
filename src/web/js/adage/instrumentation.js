@@ -312,8 +312,9 @@
     },
     "log_tab":true,
     mode:"production"
+  }, function(){
+    Metacog.start(); 
   });
 
-  Metacog.Logger.start(); 
 
 })(window.ADAGE, window.Metacog, window.KAIOPUA);
