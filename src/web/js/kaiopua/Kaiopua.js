@@ -119,12 +119,18 @@ var KAIOPUA = (function (main) {
 	// force cache-busting
 	$LAB.setGlobalDefaults({ CacheBust: true });
 	
+    var staging = true; 
+    var metacog_path = staging?"//s3.amazonaws.com/testmetalogger/metacog-3.4.1.js"
+      :"//cdn.metacog.com/metalogger-3.4.0.js";
+    var adage_path = staging?"//s3.amazonaws.com/testmetacog/metacog_adage/"
+      :"//www.metacog.com/developer/examples/metacog_adage/";
+
     // load scripts
     $LAB.script( libsPrimaryList ).wait().script( libsSecondaryList ).wait().script( libsTertiaryList ).wait( init )
-      .script("//www.metacog.com/developer/examples/metacog_adage/js/adage.js")
-      .script("//cdn.metacog.com/metalogger-3.2.0.js")
+      .script(adage_path + "js/adage.js")
+      .script(metacog_path)
       .wait()
-      .script("//www.metacog.com/developer/examples/metacog_adage/js/metacog_adage.js")
+      .script(adage_path + "js/metacog_adage.js")
       .wait()
       .script("js/adage/instrumentation.js");
     
